@@ -55,6 +55,23 @@ PortMappingSimon/
 └── .gitignore
 ```
 
+## Screenshots
+
+### 1. Dashboard Overview
+![Quantum Port Inspector Dashboard](screenshots/dashboard.jpeg)
+
+### 2. Quantum Circuit and Orthogonality Verification
+![Quantum Circuit and Verification](screenshots/verification.jpeg)
+
+### 3. Classical Recovery and Anomaly Analysis
+![Classical Recovery and Analysis](screenshots/analysis.jpeg)
+
+### 4. Final Validation
+![Validation Results](screenshots/validation.jpeg)
+
+
+
+
 ## Installation and Execution
 
 ### 1. Clone the repository
