@@ -1,135 +1,90 @@
-# Quantum Port Inspector
-### Quantum Port-Mapping Anomaly Detection Using Simon's Algorithm
+## Theoretical Solution and Mathematical Derivation
 
-## Overview
-Quantum Port Inspector is an educational project that demonstrates how Simon's Algorithm can identify a hidden binary relationship in a port-mapping system. The project combines quantum circuit simulation, classical post-processing, and an interactive Streamlit dashboard.
+### 1. Simon's Problem
 
-## Problem Statement
-A network switch maps 3-bit input ports to output labels under a hidden relationship. Each output corresponds to two inputs, and the paired inputs differ by the same unknown nonzero binary string, called the **secret string**.
-
-The objective is to recover this secret using Simon's Algorithm and verify the measurement condition:
+Let the hidden secret be a nonzero binary string \(s\in\{0,1\}^3\). The port-mapping function \(f\) follows Simon's promise:
 
 \[
-y \cdot s = 0 \pmod 2
+f(x)=f(x\oplus s)
 \]
 
-where `y` is a measured bitstring and `s` is the hidden secret.
+where \(\oplus\) represents bitwise XOR. Each output corresponds to exactly two input strings, \(x\) and \(x\oplus s\).
 
-## Objectives
-- Simulate a port-mapping function with a hidden binary relationship.
-- Implement Simon's quantum algorithm using Qiskit.
-- Recover the secret using classical post-processing.
-- Verify the orthogonality condition for measurement results.
-- Display results through an interactive Streamlit dashboard.
+For three-bit inputs, there are \(2^3=8\) possible inputs. Therefore, the mapping contains four distinct output groups, each containing two inputs.
 
-## Technologies Used
-- Python
-- Qiskit
-- Qiskit Aer
-- Streamlit
-- NumPy
-- Pandas
-- Plotly
+### 2. Quantum Algorithm
 
-## Project Features
-- Interactive secret-string selection.
-- Configurable quantum measurement shots.
-- Port-mapping table with 8 inputs and 4 output labels.
-- Quantum measurement histogram.
-- Secret recovery and orthogonality verification.
-- Classical post-processing explanation.
-- CSV report export.
-- Automated validation for all 7 possible nonzero 3-bit secrets.
+Simon's Algorithm uses a quantum circuit to obtain information about the hidden secret.
 
-## Project Structure
-```text
-PortMappingSimon/
-├── app.py
-├── port_mapping.py
-├── simon_solver.py
-├── simon_recovery.py
-├── test_simon.py
-├── verify_project.py
-├── requirements.txt
-├── README.md
-└── .gitignore
-```
+1. Initialize three input qubits and three output qubits.
+2. Apply Hadamard gates to the input qubits to create a superposition of input states.
+3. Apply the oracle that implements the promised port-mapping relationship.
+4. Apply Hadamard gates to the input register again.
+5. Measure the input register to obtain a binary string \(y\).
+6. Repeat the measurements and use classical post-processing to recover the secret.
 
-## Screenshots
+### 3. Mathematical Derivation
 
-### 1. Dashboard Overview
-![Quantum Port Inspector Dashboard](screenshots/dashboard.jpeg)
+The measurement results satisfy the following parity equation:
 
-### 2. Quantum Circuit and Orthogonality Verification
-![Quantum Circuit and Verification](screenshots/verification.jpeg)
+\[
+y\cdot s=0\pmod 2
+\]
 
-### 3. Classical Recovery and Anomaly Analysis
-![Classical Recovery and Analysis](screenshots/analysis.jpeg)
+For three-bit strings, this means:
 
-### 4. Final Validation
-![Validation Results](screenshots/validation.jpeg)
+\[
+y_1s_1\oplus y_2s_2\oplus y_3s_3=0
+\]
 
+Each measurement produces a linear equation over the binary field \(\mathbb{F}_2\). Multiple independent equations can be combined to identify the unknown secret.
 
+### 4. Worked Example
 
+Consider the secret string:
 
-## Installation and Execution
+\[
+s=101
+\]
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/jettigurupoojitha-07/Quantum-Port-Inspector.git
-cd Quantum-Port-Inspector
-```
+The parity condition becomes:
 
-### 2. Create a virtual environment
-```bash
-python -m venv .venv
-```
+\[
+y_1\oplus y_3=0
+\]
 
-### 3. Activate the environment
+Therefore, the first and third bits of each valid measurement must be equal.
 
-**Windows PowerShell**
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
+The possible measurement strings satisfying this condition are:
 
-### 4. Install dependencies
-```bash
-python -m pip install -r requirements.txt
-```
+\[
+000,\;010,\;101,\;111
+\]
 
-### 5. Run the dashboard
-```bash
-python -m streamlit run app.py
-```
+For example:
 
-Open the local URL shown in the terminal, usually `http://localhost:8501`.
+- \(000\cdot101=0\pmod2\)
+- \(010\cdot101=0\pmod2\)
+- \(101\cdot101=0\pmod2\)
+- \(111\cdot101=0\pmod2\)
 
-## Validation and Results
-The final validation script checks all 7 possible nonzero 3-bit secrets.
+The classical recovery stage checks candidate nonzero secrets against the collected equations. When the equations uniquely determine the secret, the algorithm recovers \(s=101\).
 
-The validation checks include:
-- 8 input combinations and 4 distinct output labels.
-- Each output label occurs exactly twice.
-- Inputs related by XOR with the secret share the same output.
-- Simon's Algorithm recovers the selected secret.
-- Measured bitstrings satisfy the orthogonality condition.
+### 5. Expected Results
 
-**Recorded validation result: 7/7 secrets passed.**
+For a valid three-bit Simon oracle:
 
-This result was obtained using the project's local quantum-circuit simulation.
+- There are eight input strings and four output groups.
+- Each output group contains two inputs related by XOR with the secret.
+- Every valid measured string satisfies \(y\cdot s=0\pmod2\).
+- Sufficient independent equations allow the hidden secret to be recovered.
 
-## Limitations
-- The quantum circuit is simulated on a classical computer using Qiskit Aer.
-- Results depend on the chosen oracle and the Simon promise.
-- This educational simulation does not connect to or inspect a real network switch.
+The expected secret must match the secret used to construct the simulated oracle.
 
-## Future Enhancements
-- Add a comparison of quantum and classical query counts.
-- Improve report export and dashboard visualizations.
-- Deploy the dashboard so users can access it online.
+## Quantum Simulation and Verification
 
-## Author
-**GitHub:** [jettigurupoojitha-07](https://github.com/jettigurupoojitha-07)
+The project implements the algorithm using Python, Qiskit, and Qiskit Aer. The Streamlit dashboard displays the port mapping, quantum measurement frequencies, circuit, recovered secret, and orthogonality verification.
 
-## License
-This project is intended for educational and academic demonstration.
+The `verify_project.py` validation script checks all seven possible nonzero three-bit secrets. The recorded test result was **7/7 passed**, confirming that the simulated recovery matched the selected secret in every tested case.
+
+The simulation runs on a classical computer and demonstrates the algorithm's mathematical behavior; it is not a test on physical quantum hardware.
